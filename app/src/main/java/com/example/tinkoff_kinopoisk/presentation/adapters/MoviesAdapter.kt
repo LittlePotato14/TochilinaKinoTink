@@ -17,7 +17,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.example.tinkoff_kinopoisk.R
 import com.example.tinkoff_kinopoisk.domain.models.Movie
 
-internal class MoviesAdapter(private var items: List<Movie>) : RecyclerView.Adapter<MoviesAdapter.MovieViewHolder>(){
+internal class MoviesAdapter(private var items: List<Movie>, val openMovie: (Movie) -> Unit) : RecyclerView.Adapter<MoviesAdapter.MovieViewHolder>(){
     private var context: Context? = null
 
     override fun getItemViewType(position: Int): Int {
@@ -59,9 +59,9 @@ internal class MoviesAdapter(private var items: List<Movie>) : RecyclerView.Adap
 
         // ToDo check favouritesIcon
 
-        /*holder.card.setOnClickListener {
-            openMovie(items[position].filmId)
-        }*/
+        holder.card.setOnClickListener {
+            openMovie(items[position])
+        }
 
         context?.let{
             Glide.with(it)

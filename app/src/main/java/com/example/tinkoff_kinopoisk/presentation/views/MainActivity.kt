@@ -1,11 +1,13 @@
 package com.example.tinkoff_kinopoisk.presentation.views
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tinkoff_kinopoisk.databinding.ActivityMainBinding
+import com.example.tinkoff_kinopoisk.domain.models.Movie
 import com.example.tinkoff_kinopoisk.presentation.adapters.MoviesAdapter
 import com.example.tinkoff_kinopoisk.presentation.viewsModels.MainViewModel
 
@@ -26,17 +28,23 @@ class MainActivity : AppCompatActivity() {
 
         binding.recycler.layoutManager = LinearLayoutManager(this)
 
+        val openMovie: (Movie) -> Unit = {
+            val intent = Intent(this, MovieActivity::class.java)
+            val b = Bundle()
+            b.putInt("movieId", it.filmId)
+            intent.putExtras(b)
+            startActivity(intent)
+        }
 
         mainViewModel.movies.observe(this) {
             if (adapter == null){
-                adapter = MoviesAdapter(it)
+                adapter = MoviesAdapter(it, openMovie)
                 binding.recycler.adapter = adapter
             }else{
                 val oldSize = adapter!!.getSize()
                 adapter!!.addItems(it)
                 adapter!!.notifyItemRangeInserted(oldSize, it.size)
             }
-
         }
 
         binding.recycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {

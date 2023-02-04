@@ -1,5 +1,6 @@
 package com.example.tinkoff_kinopoisk.data
 
+import com.example.tinkoff_kinopoisk.domain.models.ExtendedMovie
 import com.example.tinkoff_kinopoisk.domain.models.Top100Response
 import retrofit2.Response
 import retrofit2.http.*
@@ -16,4 +17,9 @@ internal interface KinopoiskApi {
         @Query("page") page: Int
     ): Response<Top100Response>
 
+    @GET("films/{id}")
+    suspend fun getMovieInfo(
+        @Header ("X-API-KEY") apiKey: String,
+        @Path("id") movieId: Int
+    ): Response<ExtendedMovie>
 }
