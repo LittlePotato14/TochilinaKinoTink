@@ -14,14 +14,14 @@ class MovieRepository : MovieRepository {
         private const val TOP_100_TYPE = "TOP_100_POPULAR_FILMS"
     }
 
-    override suspend fun getPopularMovies(): Result<Top100Response> {
+    override suspend fun getPopularMovies(page: Int): Result<Top100Response> {
         var result: Result<Top100Response>
 
         withContext(Dispatchers.IO) {
             val response: Response<Top100Response>
 
             try {
-                response = ApiClient.instanceVersion22.getPopularMovies(API_KEY, TOP_100_TYPE)
+                response = ApiClient.instanceVersion22.getPopularMovies(API_KEY, TOP_100_TYPE, page)
             } catch (e: Exception) {
                 print("tut " + e.message + "\n" + e.stackTrace)
                 result = Result.failure(DataException.InternetException())

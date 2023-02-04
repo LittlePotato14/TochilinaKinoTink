@@ -1,13 +1,14 @@
 package com.example.tinkoff_kinopoisk.presentation.views
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.tinkoff_kinopoisk.R
+import androidx.recyclerview.widget.RecyclerView
 import com.example.tinkoff_kinopoisk.databinding.ActivityMainBinding
 import com.example.tinkoff_kinopoisk.presentation.adapters.MoviesAdapter
 import com.example.tinkoff_kinopoisk.presentation.viewsModels.MainViewModel
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -25,10 +26,29 @@ class MainActivity : AppCompatActivity() {
 
         binding.recycler.layoutManager = LinearLayoutManager(this)
 
+
         mainViewModel.movies.observe(this) {
-            adapter = MoviesAdapter(it ?: listOf())
-            binding.recycler.adapter = adapter
+            if (adapter == null){
+                adapter = MoviesAdapter(it)
+                binding.recycler.adapter = adapter
+            }else{
+                val oldSize = adapter!!.getSize()
+                adapter!!.addItems(it)
+                adapter!!.notifyItemRangeInserted(oldSize, it.size)
+            }
+
         }
+
+        binding.recycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (recyclerView.canScrollVertically(-1) &&
+                    !recyclerView.canScrollVertically(1) &&
+                    newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    mainViewModel.getNextPagePopularMovies()
+                }
+            }
+        })
 
         /* ToDo mainViewModel.updateRecycler.observe(viewLifecycleOwner){
         binding.recycler.adapter?.notifyItemChanged(it)

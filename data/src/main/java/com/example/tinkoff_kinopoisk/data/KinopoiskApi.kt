@@ -12,7 +12,8 @@ internal interface KinopoiskApi {
     @GET("films/top")
     suspend fun getPopularMovies(
         @Header ("X-API-KEY") apiKey: String,
-        @Query("type") type: String
+        @Query("type") type: String,
+        @Query("page") page: Int
     ): Response<Top100Response>
 
 }

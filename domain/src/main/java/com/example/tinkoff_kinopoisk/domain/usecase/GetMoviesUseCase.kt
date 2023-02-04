@@ -7,7 +7,7 @@ import com.example.tinkoff_kinopoisk.domain.repository.MovieRepository
 class GetPopularMoviesUseCase(
     private val movieRepository: MovieRepository
 ) {
-    suspend fun execute(): Result<Top100Response> {
-        return movieRepository.getPopularMovies()
+    suspend fun execute(page: Int): Result<Top100Response> {
+        return movieRepository.getPopularMovies(page)
     }
 }

@@ -11,15 +11,13 @@ import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestOptions
 import com.example.tinkoff_kinopoisk.R
 import com.example.tinkoff_kinopoisk.domain.models.Movie
 
-
-internal class MoviesAdapter(private val items: List<Movie>) : RecyclerView.Adapter<MoviesAdapter.MovieViewHolder>(){
+internal class MoviesAdapter(private var items: List<Movie>) : RecyclerView.Adapter<MoviesAdapter.MovieViewHolder>(){
     private var context: Context? = null
 
     override fun getItemViewType(position: Int): Int {
@@ -28,6 +26,12 @@ internal class MoviesAdapter(private val items: List<Movie>) : RecyclerView.Adap
 
     override fun getItemCount(): Int {
         return items.count()
+    }
+
+    fun getSize() = items.size
+
+    fun addItems(newItems: List<Movie>){
+        items = items.plus(newItems)
     }
 
     override fun onCreateViewHolder(

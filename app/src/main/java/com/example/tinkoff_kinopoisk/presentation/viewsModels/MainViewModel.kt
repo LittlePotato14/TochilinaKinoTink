@@ -22,9 +22,11 @@ internal class MainViewModel(app: Application) : AndroidViewModel(app) {
     private val _movies = MutableLiveData<List<Movie>>()
     val movies: LiveData<List<Movie>> = _movies
     private var page = 1
+
     private var pagesCount = 0
 
     init {
+        _movies.value = listOf()
         getMovies()
     }
 
@@ -32,11 +34,11 @@ internal class MainViewModel(app: Application) : AndroidViewModel(app) {
         //ToDo
     }
 
-    fun getMovies(){
+    private fun getMovies(){
         val useCase = GetPopularMoviesUseCase(com.example.tinkoff_kinopoisk.data.MovieRepository())
 
         viewModelScope.launch {
-            val result = useCase.execute()
+            val result = useCase.execute(page)
 
             withContext(Dispatchers.Main) {
                 if (result.isSuccess)
@@ -47,6 +49,13 @@ internal class MainViewModel(app: Application) : AndroidViewModel(app) {
                 else if(result.exceptionOrNull() != null)
                     Toast.makeText(getApplication(), result.exceptionOrNull()?.message, Toast.LENGTH_LONG).show()
             }
+        }
+    }
+
+    fun getNextPagePopularMovies(){
+        if(page + 1 <= pagesCount) {
+            page++
+            getMovies()
         }
     }
 
