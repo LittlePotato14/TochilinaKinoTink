@@ -1,0 +1,18 @@
+package com.example.tinkoff_kinopoisk.data
+
+import com.example.tinkoff_kinopoisk.domain.models.Top100Response
+import retrofit2.Response
+import retrofit2.http.*
+
+/**
+ * API for app network operations
+ */
+internal interface KinopoiskApi {
+
+    @GET("films/top")
+    suspend fun getPopularMovies(
+        @Header ("X-API-KEY") apiKey: String,
+        @Query("type") type: String
+    ): Response<Top100Response>
+
+}

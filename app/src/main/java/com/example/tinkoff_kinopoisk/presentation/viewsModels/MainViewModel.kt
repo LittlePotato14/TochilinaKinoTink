@@ -11,6 +11,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.tinkoff_kinopoisk.domain.models.Country
 import com.example.tinkoff_kinopoisk.domain.models.Genre
 import com.example.tinkoff_kinopoisk.domain.models.Movie
+import com.example.tinkoff_kinopoisk.domain.repository.MovieRepository
+import com.example.tinkoff_kinopoisk.domain.usecase.GetPopularMoviesUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -19,6 +21,8 @@ internal class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     private val _movies = MutableLiveData<List<Movie>>()
     val movies: LiveData<List<Movie>> = _movies
+    private var page = 1
+    private var pagesCount = 0
 
     init {
         getMovies()
@@ -29,29 +33,21 @@ internal class MainViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun getMovies(){
-        _movies.value = listOf(
-            Movie(0, "Звездные войники", "", "", 2002, listOf(Genre("Фантастика"), Genre("Боевик")), listOf(Country("USA"))),
-            Movie(0, "Звездные войники2", "", "", 2002, listOf(Genre("Фантастика"), Genre("Боевик")), listOf(Country("USA"))),
-            Movie(0, "Звездные войники3", "", "", 2002, listOf(Genre("Фантастика"), Genre("Боевик")), listOf(Country("USA"))),
-            Movie(0, "Звездные войники4", "", "", 2002, listOf(Genre("Фантастика"), Genre("Боевик")), listOf(Country("USA"))),
-            Movie(0, "Звездные войники5", "", "", 2002, listOf(), listOf(Country("USA"))),
-            )
-        /*val useCase = GetEventsUseCase(UserRepository())
-
-        mSettings = (getApplication() as Context).getSharedPreferences(MySettings.APP_PREFERENCES, AppCompatActivity.MODE_PRIVATE)
-
-        val jwt = mSettings.getString(MySettings.APP_PREFERENCES_TOKEN, "") ?: ""
+        val useCase = GetPopularMoviesUseCase(com.example.tinkoff_kinopoisk.data.MovieRepository())
 
         viewModelScope.launch {
-            val result = useCase.execute(jwt)
+            val result = useCase.execute()
 
             withContext(Dispatchers.Main) {
                 if (result.isSuccess)
-                    _events.value = result.getOrNull()
+                    result.getOrNull()?.let{
+                        _movies.value = it.films
+                        pagesCount = it.pagesCount
+                    }
                 else if(result.exceptionOrNull() != null)
-                    Toast.makeText(getApplication(), (result.exceptionOrNull() as Exception).toMessage(getApplication()), Toast.LENGTH_LONG).show()
+                    Toast.makeText(getApplication(), result.exceptionOrNull()?.message, Toast.LENGTH_LONG).show()
             }
-        }*/
+        }
     }
 
 }

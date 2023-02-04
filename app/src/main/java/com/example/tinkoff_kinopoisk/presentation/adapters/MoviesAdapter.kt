@@ -4,14 +4,20 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.request.RequestOptions
 import com.example.tinkoff_kinopoisk.R
 import com.example.tinkoff_kinopoisk.domain.models.Movie
+
 
 internal class MoviesAdapter(private val items: List<Movie>) : RecyclerView.Adapter<MoviesAdapter.MovieViewHolder>(){
     private var context: Context? = null
@@ -41,7 +47,9 @@ internal class MoviesAdapter(private val items: List<Movie>) : RecyclerView.Adap
         holder.title.text = items[position].nameRu
 
         var genreYear = ""
-        genreYear += items[position].genres.getOrNull(1)?.genre.toString()
+        items[position].genres.getOrNull(1)?.let{
+            genreYear += it.genre.replaceFirstChar(Char::titlecase) + " "
+        }
         genreYear += "(" + items[position].year.toString() + ")"
         holder.genreYear.text = genreYear
 
@@ -55,7 +63,7 @@ internal class MoviesAdapter(private val items: List<Movie>) : RecyclerView.Adap
             Glide.with(it)
                 .load(items[position].posterUrlPreview)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .circleCrop()
+                .apply(RequestOptions.bitmapTransform(RoundedCorners(25)))
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .error(R.color.dark_gray)
                 .into(holder.poster)
