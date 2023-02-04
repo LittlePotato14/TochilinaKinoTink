@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/movie_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp"
+        android:layout_marginTop="7dp"
+        android:layout_marginHorizontal="16dp"
+        app:cardElevation="10dp"
+        app:cardCornerRadius="15dp"
+        app:cardBackgroundColor="?colorSurface"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guidelineStart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.20" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guidelineEnd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.80" />
+
+            <ImageView
+                android:id="@+id/poster"
+                android:layout_width="40dp"
+                android:layout_height="63dp"
+                android:layout_margin="15dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintEnd_toStartOf="@id/guidelineStart"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <LinearLayout
+                android:id="@+id/linearLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/guidelineEnd"
+                app:layout_constraintStart_toStartOf="@+id/guidelineStart"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/title"
+                    style="@style/TextAppearance.MaterialComponents.Subtitle1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:text="Title here"
+                    android:textFontWeight="500" />
+
+                <TextView
+                    android:id="@+id/genre_year"
+                    style="@style/TextAppearance.MaterialComponents.Caption"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="Фантастика (2016)"
+                    android:textFontWeight="500" />
+
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/favouritesIcon"
+                android:layout_width="15dp"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:background="@null"
+                android:contentDescription="@string/added_to_favourites"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_star"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginEnd="15dp"
+                app:layout_constraintTop_toTopOf="@+id/linearLayout" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
