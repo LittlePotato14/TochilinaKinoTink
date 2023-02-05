@@ -31,8 +31,8 @@ internal class FavouritesViewModel(app: Application) : AndroidViewModel(app) {
             val listOfExtendedMovies = mutableListOf<ExtendedMovie>()
 
             while(cursor.moveToNext()) {
-                listOfMovies.add(Movie(cursor.getInt(1), cursor.getString(2), "", cursor.getInt(3), cursor.getString(4).split(", ").map { Genre(it) }, cursor.getString(5).split(", ").map { Country(it) }, true))
-                listOfExtendedMovies.add(ExtendedMovie(cursor.getString(2), "", cursor.getString(6), cursor.getString(4).split(", ").map { Genre(it) }, cursor.getString(5).split(", ").map { Country(it) }))
+                listOfMovies.add(Movie(cursor.getInt(1), cursor.getString(2), "", cursor.getInt(3), cursor.getString(4).split(", ").map { Genre(it) }, cursor.getString(5).split(", ").map { Country(it) }, true, cursor.getBlob(8)))
+                listOfExtendedMovies.add(ExtendedMovie(cursor.getString(2), "", cursor.getString(6), cursor.getString(4).split(", ").map { Genre(it) }, cursor.getString(5).split(", ").map { Country(it) }, cursor.getBlob(7)))
             }
 
             _extendedMovies.value = listOfExtendedMovies

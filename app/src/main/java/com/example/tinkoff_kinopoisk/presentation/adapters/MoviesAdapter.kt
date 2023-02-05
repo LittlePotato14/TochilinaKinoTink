@@ -1,6 +1,8 @@
 package com.example.tinkoff_kinopoisk.presentation.adapters
 
 import android.content.Context
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -92,13 +94,23 @@ internal class MoviesAdapter(val items: MutableList<Movie>, val openMovie: (Movi
         }
 
         context?.let{
-            Glide.with(it)
-                .load(items[position].posterUrlPreview)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .apply(RequestOptions.bitmapTransform(RoundedCorners(25)))
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .error(R.color.dark_gray)
-                .into(holder.poster)
+            if (items[position].posterPreview !== null) {
+                val byteArray = items[position].posterPreview
+                Glide.with(it)
+                    .load(BitmapDrawable(it.resources, BitmapFactory.decodeByteArray(byteArray, 0, byteArray!!.size)))
+                    .apply(RequestOptions.bitmapTransform(RoundedCorners(25)))
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .error(R.color.dark_gray)
+                    .into(holder.poster)
+            } else {
+                Glide.with(it)
+                    .load(items[position].posterUrlPreview)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .apply(RequestOptions.bitmapTransform(RoundedCorners(25)))
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .error(R.color.dark_gray)
+                    .into(holder.poster)
+            }
         }
     }
 

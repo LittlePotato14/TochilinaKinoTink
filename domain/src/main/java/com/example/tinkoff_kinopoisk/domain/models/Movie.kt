@@ -7,7 +7,8 @@ data class Movie(
     val year: Int,
     val genres: List<Genre>,
     val countries: List<Country>,
-    var isFavourite: Boolean?
+    var isFavourite: Boolean?,
+    val posterPreview: ByteArray?
 )
 
 data class ExtendedMovie(
@@ -15,7 +16,8 @@ data class ExtendedMovie(
     val posterUrl: String,
     val description: String,
     val genres: List<Genre>,
-    val countries: List<Country>
+    val countries: List<Country>,
+    val poster: ByteArray?
 )
 
 data class Genre(

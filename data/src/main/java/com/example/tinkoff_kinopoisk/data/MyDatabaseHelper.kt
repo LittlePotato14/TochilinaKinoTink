@@ -5,6 +5,7 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.graphics.drawable.Drawable
 import com.example.tinkoff_kinopoisk.domain.models.Country
 import com.example.tinkoff_kinopoisk.domain.models.ExtendedMovie
 import com.example.tinkoff_kinopoisk.domain.models.Genre
@@ -20,6 +21,8 @@ class MyDatabaseHelper(private val context: Context): SQLiteOpenHelper(context, 
         const val COLUMN_ID = "_id"
         const val COLUMN_KINOPOISK_ID = "kinopoisk_id"
         const val COLUMN_TITLE = "movie_title"
+        const val COLUMN_POSTER_PREVIEW = "poster_preview"
+        const val COLUMN_POSTER = "poster"
         const val COLUMN_YEAR = "movie_year"
         const val COLUMN_GENRES = "movie_genres"
         const val COLUMN_COUNTRIES = "movie_countries"
@@ -27,7 +30,7 @@ class MyDatabaseHelper(private val context: Context): SQLiteOpenHelper(context, 
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
-        val query = "CREATE TABLE $TABLE_NAME ($COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT, $COLUMN_KINOPOISK_ID INTEGER, $COLUMN_TITLE TEXT, $COLUMN_YEAR INTEGER, $COLUMN_GENRES TEXT, $COLUMN_COUNTRIES TEXT, $COLUMN_DESCRIPTION TEXT);"
+        val query = "CREATE TABLE $TABLE_NAME ($COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT, $COLUMN_KINOPOISK_ID INTEGER, $COLUMN_TITLE TEXT, $COLUMN_YEAR INTEGER, $COLUMN_GENRES TEXT, $COLUMN_COUNTRIES TEXT, $COLUMN_DESCRIPTION TEXT, $COLUMN_POSTER BLOB, $COLUMN_POSTER_PREVIEW BLOB);"
         db?.execSQL(query)
     }
 
@@ -38,7 +41,7 @@ class MyDatabaseHelper(private val context: Context): SQLiteOpenHelper(context, 
         }
     }
 
-    fun addMovieToFavourites(movie: Movie, description: String): Boolean{
+    fun addMovieToFavourites(movie: Movie, description: String, poster: ByteArray, posterPreview: ByteArray): Boolean{
         val db = writableDatabase
         val cv = ContentValues()
 
@@ -48,6 +51,8 @@ class MyDatabaseHelper(private val context: Context): SQLiteOpenHelper(context, 
         cv.put(COLUMN_GENRES, movie.genres.joinToString(", ", transform = {it.genre}))
         cv.put(COLUMN_COUNTRIES, movie.countries.joinToString(", ", transform = {it.country}))
         cv.put(COLUMN_DESCRIPTION, description)
+        cv.put(COLUMN_POSTER, poster)
+        cv.put(COLUMN_POSTER_PREVIEW, posterPreview)
 
         return db.insert(TABLE_NAME, null, cv) != (-1).toLong()
     }
@@ -64,6 +69,15 @@ class MyDatabaseHelper(private val context: Context): SQLiteOpenHelper(context, 
         var cursor: Cursor? = null
         if(db != null)
             cursor = db.rawQuery(query, null)
+        return cursor
+    }
+    fun getMovieById(kinopoiskId: Int): Cursor?{
+        val query = "SELECT * FROM $TABLE_NAME WHERE $COLUMN_KINOPOISK_ID = ?"
+        val db = readableDatabase
+
+        var cursor: Cursor? = null
+        if(db != null)
+            cursor = db.rawQuery(query, arrayOf(kinopoiskId.toString()))
         return cursor
     }
 }

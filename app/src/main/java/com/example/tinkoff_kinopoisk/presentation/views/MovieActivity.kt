@@ -1,5 +1,7 @@
 package com.example.tinkoff_kinopoisk.presentation.views
 
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -25,22 +27,37 @@ class MovieActivity : AppCompatActivity() {
 
         val b = intent.extras
         b?.let {
-            movieViewModel.getMovieInfo(b.getInt("movieId"))
+            val movieId = it.getInt("movieId");
+
+            movieViewModel.getMovieByIdFromDb(movieId)
+
+            if (movieViewModel.movie.value == null) {
+                movieViewModel.getMovieInfo(movieId)
+            }
         }
 
         movieViewModel.movie.observe(this){ movieInfo ->
-            Glide.with(this)
-                .load(movieInfo.posterUrl)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .error(R.color.dark_gray)
-                .into(binding.poster)
+            if (movieInfo.poster != null) {
+                val byteArray = movieInfo.poster
+                Glide.with(this)
+                    .load(BitmapDrawable(this.resources, BitmapFactory.decodeByteArray(byteArray, 0, byteArray!!.size)))
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .error(R.color.dark_gray)
+                    .into(binding.poster)
+            } else {
+                Glide.with(this)
+                    .load(movieInfo.posterUrl)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .error(R.color.dark_gray)
+                    .into(binding.poster)
+            }
 
             binding.title.text = movieInfo.nameRu
             binding.description.text = movieInfo.description
-            var genres = "<b>" + "Жанры: " + "</b>" + movieInfo.genres.joinToString(", ", transform = {it.genre})
+            val genres = "<b>" + "Жанры: " + "</b>" + movieInfo.genres.joinToString(", ", transform = {it.genre})
             binding.genres.text = HtmlCompat.fromHtml(genres, HtmlCompat.FROM_HTML_MODE_COMPACT )
-            var countries = "<b>" + "Страны: " + "</b>" + movieInfo.countries.joinToString(", ", transform = {it.country})
+            val countries = "<b>" + "Страны: " + "</b>" + movieInfo.countries.joinToString(", ", transform = {it.country})
             binding.countries.text = HtmlCompat.fromHtml(countries, HtmlCompat.FROM_HTML_MODE_COMPACT )
         }
     }
