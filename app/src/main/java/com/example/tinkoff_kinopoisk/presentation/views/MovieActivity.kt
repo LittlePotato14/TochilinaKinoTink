@@ -37,16 +37,19 @@ class MovieActivity : AppCompatActivity() {
         }
 
         movieViewModel.movie.observe(this){ movieInfo ->
+            // If data was fetched from db, we would have byte array in 'poster' field
             if (movieInfo.poster != null) {
                 val byteArray = movieInfo.poster
                 Glide.with(this)
                     .load(BitmapDrawable(this.resources, BitmapFactory.decodeByteArray(byteArray, 0, byteArray!!.size)))
+                    .centerCrop()
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .error(R.color.dark_gray)
                     .into(binding.poster)
             } else {
                 Glide.with(this)
                     .load(movieInfo.posterUrl)
+                    .centerCrop()
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .error(R.color.dark_gray)

@@ -3,4 +3,5 @@
     <string name="Popular">Популярные</string>
     <string name="Favourites">Избранное</string>
     <string name="added_to_favourites">Добавлено в избранное</string>
+    <string name="Search">Поиск</string>
 </resources>

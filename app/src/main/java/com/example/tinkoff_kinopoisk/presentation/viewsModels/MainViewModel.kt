@@ -17,15 +17,17 @@ import com.example.tinkoff_kinopoisk.domain.models.Country
 import com.example.tinkoff_kinopoisk.domain.models.Genre
 import com.example.tinkoff_kinopoisk.domain.models.Movie
 import com.example.tinkoff_kinopoisk.domain.usecase.GetMovieInformationUseCase
+import com.example.tinkoff_kinopoisk.domain.usecase.GetMoviesByKeywordUseCase
 import com.example.tinkoff_kinopoisk.domain.usecase.GetPopularMoviesUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-internal class MainViewModel(val app: Application) : AndroidViewModel(app) {
+class MainViewModel(val app: Application) : AndroidViewModel(app) {
 
     private val _movies = MutableLiveData<List<Movie>>()
     val movies: LiveData<List<Movie>> = _movies
+    var isSearch: Boolean = false
     private var page = 1
     private var pagesCount = 0
     private val savedMovies = mutableListOf<Movie>()
@@ -109,14 +111,62 @@ internal class MainViewModel(val app: Application) : AndroidViewModel(app) {
 
     init {
         _movies.value = listOf()
-        getMovies()
     }
 
-    private fun getMovies() {
+    fun getMovies() {
         val useCase = GetPopularMoviesUseCase(com.example.tinkoff_kinopoisk.data.MovieRepository())
 
         viewModelScope.launch {
             val result = useCase.execute(page)
+
+            withContext(Dispatchers.Main) {
+                if (result.isSuccess)
+                    result.getOrNull()?.let {
+
+                        // get saved to favourites
+                        val myDBHelper = MyDatabaseHelper(app)
+                        val cursor = myDBHelper.getAllSavedMovies()
+                        if (cursor != null)
+                            while (cursor.moveToNext())
+                                savedMovies.add(
+                                    Movie(
+                                        cursor.getInt(1),
+                                        cursor.getString(2),
+                                        "",
+                                        cursor.getInt(3),
+                                        cursor.getString(4).split(", ").map { Genre(it) },
+                                        cursor.getString(5).split(", ").map { Country(it) },
+                                        true,
+                                        cursor.getBlob(7))
+                                )
+
+                        // check for favourites
+                        it.films.forEach { i ->
+                            i.isFavourite = findInFavourites(i.filmId)
+                        }
+
+                        // update movies list
+                        _movies.value = it.films
+                        pagesCount = it.pagesCount
+                    }
+                else if (result.exceptionOrNull() != null)
+                    Toast.makeText(
+                        getApplication(),
+                        result.exceptionOrNull()?.message,
+                        Toast.LENGTH_LONG
+                    ).show()
+            }
+        }
+    }
+
+    fun getMovies(query: String, isNewSearch: Boolean?) {
+        if (isNewSearch != null) {
+            isSearch = isNewSearch
+        }
+        val useCase = GetMoviesByKeywordUseCase(com.example.tinkoff_kinopoisk.data.MovieRepository())
+
+        viewModelScope.launch {
+            val result = useCase.execute(query, page)
 
             withContext(Dispatchers.Main) {
                 if (result.isSuccess)
@@ -170,6 +220,13 @@ internal class MainViewModel(val app: Application) : AndroidViewModel(app) {
         if (page + 1 <= pagesCount) {
             page++
             getMovies()
+        }
+    }
+
+    fun getNextPageSearchMovies(query: String) {
+        if (page + 1 <= pagesCount) {
+            page++
+            getMovies(query, false)
         }
     }
 

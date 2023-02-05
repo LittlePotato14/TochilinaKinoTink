@@ -1,6 +1,7 @@
 package com.example.tinkoff_kinopoisk.data
 
 import com.example.tinkoff_kinopoisk.domain.models.ExtendedMovie
+import com.example.tinkoff_kinopoisk.domain.models.FilmsResponse
 import com.example.tinkoff_kinopoisk.domain.models.Top100Response
 import com.example.tinkoff_kinopoisk.domain.repository.MovieRepository
 import kotlinx.coroutines.*
@@ -23,6 +24,28 @@ class MovieRepository : MovieRepository {
 
             try {
                 response = ApiClient.instanceVersion22.getPopularMovies(API_KEY, TOP_100_TYPE, page)
+            } catch (e: Exception) {
+                result = Result.failure(DataException.InternetException())
+                return@withContext
+            }
+
+            result = if(!response.isSuccessful)
+                Result.failure(DataException.responseCodeToException(response.code()))
+            else
+                Result.success(response.body()!!)
+        }
+
+        return result
+    }
+
+    override suspend fun getMoviesByKeyword(keyword: String, page: Int): Result<FilmsResponse> {
+        var result: Result<FilmsResponse>
+
+        withContext(Dispatchers.IO) {
+            val response: Response<FilmsResponse>
+
+            try {
+                response = ApiClient.instanceVersion21.searchMoviesByKeyword(API_KEY, keyword, page)
             } catch (e: Exception) {
                 result = Result.failure(DataException.InternetException())
                 return@withContext

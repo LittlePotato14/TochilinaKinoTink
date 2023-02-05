@@ -1,47 +1,50 @@
 package com.example.tinkoff_kinopoisk.presentation.views
 
 import android.content.Intent
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.View
+import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.tinkoff_kinopoisk.databinding.ActivityMainBinding
+import com.example.tinkoff_kinopoisk.databinding.ActivitySearchBinding
 import com.example.tinkoff_kinopoisk.domain.models.Movie
 import com.example.tinkoff_kinopoisk.presentation.adapters.MoviesAdapter
 import com.example.tinkoff_kinopoisk.presentation.viewsModels.MainViewModel
 
-
-class MainActivity : AppCompatActivity() {
-    private var _binding: ActivityMainBinding? = null
+class SearchActivity : AppCompatActivity() {
+    private var _binding: ActivitySearchBinding? = null
     private val binding get() = _binding!!
     private val mainViewModel: MainViewModel by viewModels()
+    private var query: String? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        _binding = ActivityMainBinding.inflate(layoutInflater)
+        _binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Open search page
-        binding.searchButton.setOnClickListener {
-            startActivity(Intent(this, SearchActivity::class.java))
+        // Send search request with user query
+        binding.editText.setOnKeyListener { view, keyCode, event ->
+            if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN) {
+                binding.spinner.visibility = View.VISIBLE
+                query = (view as EditText).text.toString()
+                mainViewModel.getMovies(query!!, true)
+                return@setOnKeyListener true
+            }
+            return@setOnKeyListener false
         }
 
-        // Open favourites page
-        binding.favouritesButton.setOnClickListener {
-            startActivity(Intent(this, FavouritesActivity::class.java))
-            finish()
-        }
-
-        mainViewModel.getMovies()
+        // Return to tha main activity
+        binding.backButton.setOnClickListener { onBackPressed() }
 
         initMoviesRecycle(binding, mainViewModel)
     }
 
-    fun initMoviesRecycle(binding: ActivityMainBinding, mainViewModel: MainViewModel) {
+    fun initMoviesRecycle(binding: ActivitySearchBinding, mainViewModel: MainViewModel) {
         binding.recycler.layoutManager = LinearLayoutManager(this)
 
         val openMovie: (Movie) -> Unit = {
@@ -56,15 +59,18 @@ class MainActivity : AppCompatActivity() {
         binding.recycler.adapter = adapter
 
         mainViewModel.movies.observe(this) {
-                if (it.isNotEmpty()) {
-                    binding.spinner.visibility = View.GONE
-                }
-                val oldSize = adapter.itemCount
+            val oldSize = adapter.itemCount
+
+            if (mainViewModel.isSearch) {
+                binding.spinner.visibility = View.GONE
+                adapter.replaceItems(it.toMutableList())
+                adapter.notifyDataSetChanged()
+            } else {
                 adapter.addItems(it)
                 adapter.notifyItemRangeInserted(oldSize, it.size)
+            }
         }
 
-        // Save or remove movie from favourites
         mainViewModel.toggleFavouriteMovie.observe(this) {
             if (it.success) {
                 if (it.isSaving) {
@@ -88,7 +94,6 @@ class MainActivity : AppCompatActivity() {
                 }
         }
 
-        // Infinite scroll (pagination)
         binding.recycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
@@ -96,11 +101,11 @@ class MainActivity : AppCompatActivity() {
                     !recyclerView.canScrollVertically(1) &&
                     newState == RecyclerView.SCROLL_STATE_IDLE
                 ) {
-                    mainViewModel.getNextPagePopularMovies()
+                    if (query != null)
+                        mainViewModel.getNextPageSearchMovies(query!!)
                 }
             }
         })
     }
 }
-
 

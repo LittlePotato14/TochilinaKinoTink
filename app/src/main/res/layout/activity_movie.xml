@@ -19,8 +19,9 @@
 
             <ImageView
                 android:id="@+id/poster"
+                android:background="@color/shimmer_color"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="533dp"
                 app:layout_constraintDimensionRatio="1:2"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -30,10 +31,9 @@
                 android:layout_marginTop="15dp"
                 android:id="@+id/title"
                 style="@style/TextAppearance.MaterialComponents.Headline6"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="32dp"
-                android:text="Title here"
+                android:layout_marginHorizontal="32dp"
                 android:textFontWeight="600"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -44,8 +44,7 @@
                 style="@style/TextAppearance.MaterialComponents.Caption"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="32dp"
-                android:text="Lorem ipsum"
+                android:layout_marginHorizontal="32dp"
                 android:textFontWeight="400"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -56,8 +55,7 @@
                 style="@style/TextAppearance.MaterialComponents.Caption"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="32dp"
-                android:text="Genres"
+                android:layout_marginHorizontal="32dp"
                 android:textFontWeight="400"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -68,8 +66,7 @@
                 style="@style/TextAppearance.MaterialComponents.Caption"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="32dp"
-                android:text="Countries"
+                android:layout_marginHorizontal="32dp"
                 android:textFontWeight="400"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

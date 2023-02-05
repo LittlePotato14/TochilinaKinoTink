@@ -19,7 +19,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.example.tinkoff_kinopoisk.R
 import com.example.tinkoff_kinopoisk.domain.models.Movie
 
-internal class MoviesAdapter(val items: MutableList<Movie>, val openMovie: (Movie) -> Unit, val toggleInFavourites: (Movie, Int) -> Unit) : RecyclerView.Adapter<MoviesAdapter.MovieViewHolder>(){
+class MoviesAdapter(var items: MutableList<Movie>, val openMovie: (Movie) -> Unit, val toggleInFavourites: (Movie, Int) -> Unit) : RecyclerView.Adapter<MoviesAdapter.MovieViewHolder>(){
     private var context: Context? = null
 
     override fun getItemViewType(position: Int): Int {
@@ -36,6 +36,11 @@ internal class MoviesAdapter(val items: MutableList<Movie>, val openMovie: (Movi
 
     fun removeItem(position: Int){
         items.removeAt(position)
+    }
+
+    fun replaceItems(newItems: MutableList<Movie>){
+        items.clear()
+        items.addAll(newItems)
     }
 
     fun makeItemSaved(position: Int){

@@ -25,6 +25,7 @@ internal class FavouritesViewModel(app: Application) : AndroidViewModel(app) {
 
     init {
         val myDBHelper = MyDatabaseHelper(app)
+        // Fetch favourite movies from db
         val cursor = myDBHelper.getAllSavedMovies()
         if (cursor != null) {
             val listOfMovies = mutableListOf<Movie>()
@@ -43,6 +44,7 @@ internal class FavouritesViewModel(app: Application) : AndroidViewModel(app) {
     private val _removeFavouriteMovie = MutableLiveData<RemoveFavouriteMovie>()
     val removeFavouriteMovie: LiveData<RemoveFavouriteMovie> = _removeFavouriteMovie
 
+    // Remove movie from db
     val removeFromFavourites: (Movie, Int) -> Unit = { it1, it2 ->
         val myDB = MyDatabaseHelper(app)
         if(it1.isFavourite == true) {
