@@ -5,7 +5,9 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import android.widget.Toast
+import com.example.tinkoff_kinopoisk.domain.models.Country
+import com.example.tinkoff_kinopoisk.domain.models.ExtendedMovie
+import com.example.tinkoff_kinopoisk.domain.models.Genre
 import com.example.tinkoff_kinopoisk.domain.models.Movie
 
 class MyDatabaseHelper(private val context: Context): SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {

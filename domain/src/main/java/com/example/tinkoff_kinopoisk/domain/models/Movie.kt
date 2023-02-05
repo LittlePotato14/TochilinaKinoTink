@@ -4,9 +4,10 @@ data class Movie(
     val filmId: Int,
     val nameRu: String,
     val posterUrlPreview: String,
-    var year: Int,
+    val year: Int,
     val genres: List<Genre>,
-    val countries: List<Country>
+    val countries: List<Country>,
+    var isFavourite: Boolean?
 )
 
 data class ExtendedMovie(

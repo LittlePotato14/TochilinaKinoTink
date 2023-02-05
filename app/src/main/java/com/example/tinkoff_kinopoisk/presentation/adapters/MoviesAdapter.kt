@@ -1,6 +1,7 @@
 package com.example.tinkoff_kinopoisk.presentation.adapters
 
 import android.content.Context
+import android.opengl.Visibility
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,6 +36,10 @@ internal class MoviesAdapter(private var items: List<Movie>, val openMovie: (Mov
         items = items.plus(newItems)
     }
 
+    fun makeItemSaved(position: Int){
+        items[position].isFavourite = true
+    }
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -58,7 +63,20 @@ internal class MoviesAdapter(private var items: List<Movie>, val openMovie: (Mov
         genreYear += "(" + items[position].year.toString() + ")"
         holder.genreYear.text = genreYear
 
-        // ToDo check favouritesIcon
+        if(items[position].isFavourite == true)
+            with(holder.favouritesIcon){
+                visibility = View.VISIBLE
+                isEnabled = true
+            }
+        else
+            with(holder.favouritesIcon){
+                visibility = View.GONE
+                isEnabled = false
+            }
+
+        holder.favouritesIcon.setOnClickListener {
+
+        }
 
         // ToDo remove from favourites
 

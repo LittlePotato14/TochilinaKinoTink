@@ -54,6 +54,7 @@ class MainActivity : AppCompatActivity() {
 
         mainViewModel.savingMovie.observe(this){
             if(it.success){
+                adapter?.makeItemSaved(it.position)
                 adapter?.notifyItemChanged(it.position)
                 Toast.makeText(this, "Фильм сохранен в избранные", Toast.LENGTH_SHORT).show()
             }else

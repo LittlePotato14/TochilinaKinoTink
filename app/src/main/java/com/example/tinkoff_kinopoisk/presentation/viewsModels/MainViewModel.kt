@@ -10,6 +10,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.tinkoff_kinopoisk.data.MyDatabaseHelper
 import com.example.tinkoff_kinopoisk.domain.models.Country
+import com.example.tinkoff_kinopoisk.domain.models.ExtendedMovie
 import com.example.tinkoff_kinopoisk.domain.models.Genre
 import com.example.tinkoff_kinopoisk.domain.models.Movie
 import com.example.tinkoff_kinopoisk.domain.repository.MovieRepository
@@ -19,29 +20,37 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-internal class MainViewModel(app: Application) : AndroidViewModel(app) {
+internal class MainViewModel(val app: Application) : AndroidViewModel(app) {
 
     private val _movies = MutableLiveData<List<Movie>>()
     val movies: LiveData<List<Movie>> = _movies
     private var page = 1
     private var pagesCount = 0
+    private val savedMovies = mutableListOf<Movie>()
 
     private val _savingMovie = MutableLiveData<SavingMovie>()
     val savingMovie: LiveData<SavingMovie> = _savingMovie
 
     val saveToFavourites: (Movie, Int) -> Unit = { it1, it2 ->
-        val myDB = MyDatabaseHelper(app)
+        if(it1.isFavourite != true) {
+            val myDB = MyDatabaseHelper(app)
 
-        val useCase = GetMovieInformationUseCase(com.example.tinkoff_kinopoisk.data.MovieRepository())
+            val useCase =
+                GetMovieInformationUseCase(com.example.tinkoff_kinopoisk.data.MovieRepository())
 
-        viewModelScope.launch {
-            val result = useCase.execute(it1.filmId)
+            viewModelScope.launch {
+                val result = useCase.execute(it1.filmId)
 
-            withContext(Dispatchers.Main) {
-                if (result.isSuccess && myDB.addMovieToFavourites(it1, result.getOrNull()?.description!!))
-                    _savingMovie.value = SavingMovie(it2, true)
-                else
-                    _savingMovie.value = SavingMovie(it2, false)
+                withContext(Dispatchers.Main) {
+                    if (result.isSuccess && myDB.addMovieToFavourites(
+                            it1,
+                            result.getOrNull()?.description!!
+                        )
+                    )
+                        _savingMovie.value = SavingMovie(it2, true)
+                    else
+                        _savingMovie.value = SavingMovie(it2, false)
+                }
             }
         }
     }
@@ -60,6 +69,20 @@ internal class MainViewModel(app: Application) : AndroidViewModel(app) {
             withContext(Dispatchers.Main) {
                 if (result.isSuccess)
                     result.getOrNull()?.let{
+
+                        // get saved to favourites
+                        val myDBHelper = MyDatabaseHelper(app)
+                        val cursor = myDBHelper.getAllSavedMovies()
+                        if (cursor != null)
+                            while(cursor.moveToNext())
+                                savedMovies.add(Movie(cursor.getInt(1), cursor.getString(2), "", cursor.getInt(3), cursor.getString(4).split(", ").map { Genre(it) }, cursor.getString(5).split(", ").map { Country(it) }, true))
+
+                        // check for favourites
+                        it.films.forEach { i ->
+                            i.isFavourite = findInFavourites(i.filmId)
+                        }
+
+                        // update movies list
                         _movies.value = it.films
                         pagesCount = it.pagesCount
                     }
@@ -67,6 +90,14 @@ internal class MainViewModel(app: Application) : AndroidViewModel(app) {
                     Toast.makeText(getApplication(), result.exceptionOrNull()?.message, Toast.LENGTH_LONG).show()
             }
         }
+    }
+
+    private fun findInFavourites(movieId: Int): Boolean{
+        savedMovies.forEach { i ->
+            if (i.filmId == movieId)
+                return true
+        }
+        return false
     }
 
     fun getNextPagePopularMovies(){
