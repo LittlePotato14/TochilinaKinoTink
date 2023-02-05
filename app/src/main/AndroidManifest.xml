@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TinkoffKinopoisk">
         <activity
+            android:name=".presentation.views.FavouritesActivity"
+            android:exported="false" />
+        <activity
             android:name=".presentation.views.MovieActivity"
             android:exported="false" />
         <activity

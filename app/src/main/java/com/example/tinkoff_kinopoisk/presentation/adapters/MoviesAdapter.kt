@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -17,7 +18,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.example.tinkoff_kinopoisk.R
 import com.example.tinkoff_kinopoisk.domain.models.Movie
 
-internal class MoviesAdapter(private var items: List<Movie>, val openMovie: (Movie) -> Unit) : RecyclerView.Adapter<MoviesAdapter.MovieViewHolder>(){
+internal class MoviesAdapter(private var items: List<Movie>, val openMovie: (Movie) -> Unit, val saveToFavourites: (Movie, Int) -> Unit) : RecyclerView.Adapter<MoviesAdapter.MovieViewHolder>(){
     private var context: Context? = null
 
     override fun getItemViewType(position: Int): Int {
@@ -59,8 +60,15 @@ internal class MoviesAdapter(private var items: List<Movie>, val openMovie: (Mov
 
         // ToDo check favouritesIcon
 
+        // ToDo remove from favourites
+
         holder.card.setOnClickListener {
             openMovie(items[position])
+        }
+
+        holder.card.setOnLongClickListener {
+            saveToFavourites(items[position], position)
+            true
         }
 
         context?.let{
