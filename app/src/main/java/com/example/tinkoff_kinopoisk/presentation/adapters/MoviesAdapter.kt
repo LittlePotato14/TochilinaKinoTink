@@ -1,14 +1,12 @@
 package com.example.tinkoff_kinopoisk.presentation.adapters
 
 import android.content.Context
-import android.opengl.Visibility
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -19,7 +17,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.example.tinkoff_kinopoisk.R
 import com.example.tinkoff_kinopoisk.domain.models.Movie
 
-internal class MoviesAdapter(private var items: List<Movie>, val openMovie: (Movie) -> Unit, val saveToFavourites: (Movie, Int) -> Unit) : RecyclerView.Adapter<MoviesAdapter.MovieViewHolder>(){
+internal class MoviesAdapter(val items: MutableList<Movie>, val openMovie: (Movie) -> Unit, val toggleInFavourites: (Movie, Int) -> Unit) : RecyclerView.Adapter<MoviesAdapter.MovieViewHolder>(){
     private var context: Context? = null
 
     override fun getItemViewType(position: Int): Int {
@@ -30,14 +28,20 @@ internal class MoviesAdapter(private var items: List<Movie>, val openMovie: (Mov
         return items.count()
     }
 
-    fun getSize() = items.size
-
     fun addItems(newItems: List<Movie>){
-        items = items.plus(newItems)
+        items.addAll(newItems)
+    }
+
+    fun removeItem(position: Int){
+        items.removeAt(position)
     }
 
     fun makeItemSaved(position: Int){
         items[position].isFavourite = true
+    }
+
+    fun makeItemRemoved(position: Int){
+        items[position].isFavourite = false
     }
 
     override fun onCreateViewHolder(
@@ -83,7 +87,7 @@ internal class MoviesAdapter(private var items: List<Movie>, val openMovie: (Mov
         }
 
         holder.card.setOnLongClickListener {
-            saveToFavourites(items[position], position)
+            toggleInFavourites(items[position], position)
             true
         }
 

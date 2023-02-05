@@ -7,7 +7,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.tinkoff_kinopoisk.data.MyDatabaseHelper
 import com.example.tinkoff_kinopoisk.databinding.ActivityMainBinding
 import com.example.tinkoff_kinopoisk.domain.models.Movie
 import com.example.tinkoff_kinopoisk.presentation.adapters.MoviesAdapter
@@ -43,22 +42,32 @@ class MainActivity : AppCompatActivity() {
 
         mainViewModel.movies.observe(this) {
             if (adapter == null){
-                adapter = MoviesAdapter(it, openMovie, mainViewModel.saveToFavourites)
+                adapter = MoviesAdapter(it.toMutableList(), openMovie, mainViewModel.toggleInFavourites)
                 binding.recycler.adapter = adapter
             }else{
-                val oldSize = adapter!!.getSize()
+                val oldSize = adapter!!.itemCount
                 adapter!!.addItems(it)
                 adapter!!.notifyItemRangeInserted(oldSize, it.size)
             }
         }
 
-        mainViewModel.savingMovie.observe(this){
+        mainViewModel.toggleFavouriteMovie.observe(this){
             if(it.success){
-                adapter?.makeItemSaved(it.position)
+                if (it.isSaving) {
+                    adapter?.makeItemSaved(it.position)
+                    Toast.makeText(this, "Фильм сохранен в избранные", Toast.LENGTH_SHORT).show()
+                } else {
+                    adapter?.makeItemRemoved(it.position)
+                    Toast.makeText(this, "Фильм удален из избранного", Toast.LENGTH_SHORT).show()
+                }
+
                 adapter?.notifyItemChanged(it.position)
-                Toast.makeText(this, "Фильм сохранен в избранные", Toast.LENGTH_SHORT).show()
             }else
-                Toast.makeText(this, "Не удалось сохранить фильм", Toast.LENGTH_SHORT).show()
+                if (it.isSaving) {
+                    Toast.makeText(this, "Не удалось сохранить фильм", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "Не удалось удалить фильм из избранного", Toast.LENGTH_SHORT).show()
+                }
         }
 
         binding.recycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {

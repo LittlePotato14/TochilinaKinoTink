@@ -4,11 +4,17 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
+import com.example.tinkoff_kinopoisk.data.MovieRepository
 import com.example.tinkoff_kinopoisk.data.MyDatabaseHelper
 import com.example.tinkoff_kinopoisk.domain.models.Country
 import com.example.tinkoff_kinopoisk.domain.models.ExtendedMovie
 import com.example.tinkoff_kinopoisk.domain.models.Genre
 import com.example.tinkoff_kinopoisk.domain.models.Movie
+import com.example.tinkoff_kinopoisk.domain.usecase.GetMovieInformationUseCase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 internal class FavouritesViewModel(app: Application) : AndroidViewModel(app) {
     private val _extendedMovies = MutableLiveData<List<ExtendedMovie>>()
@@ -33,4 +39,26 @@ internal class FavouritesViewModel(app: Application) : AndroidViewModel(app) {
             _movies.value = listOfMovies
         }
     }
+
+    private val _removeFavouriteMovie = MutableLiveData<RemoveFavouriteMovie>()
+    val removeFavouriteMovie: LiveData<RemoveFavouriteMovie> = _removeFavouriteMovie
+
+    val removeFromFavourites: (Movie, Int) -> Unit = { it1, it2 ->
+        val myDB = MyDatabaseHelper(app)
+        if(it1.isFavourite == true) {
+            viewModelScope.launch {
+                withContext(Dispatchers.Main) {
+                    if (myDB.removeMovieFromFavourites(it1))
+                        _removeFavouriteMovie.value = RemoveFavouriteMovie(it2, true)
+                    else
+                        _removeFavouriteMovie.value = RemoveFavouriteMovie(it2, false)
+                }
+            }
+        }
+    }
 }
+
+data class RemoveFavouriteMovie(
+    var position: Int,
+    var success: Boolean
+)

@@ -1,19 +1,15 @@
 package com.example.tinkoff_kinopoisk.presentation.viewsModels
 
 import android.app.Application
-import android.content.Context
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.tinkoff_kinopoisk.data.MyDatabaseHelper
 import com.example.tinkoff_kinopoisk.domain.models.Country
-import com.example.tinkoff_kinopoisk.domain.models.ExtendedMovie
 import com.example.tinkoff_kinopoisk.domain.models.Genre
 import com.example.tinkoff_kinopoisk.domain.models.Movie
-import com.example.tinkoff_kinopoisk.domain.repository.MovieRepository
 import com.example.tinkoff_kinopoisk.domain.usecase.GetMovieInformationUseCase
 import com.example.tinkoff_kinopoisk.domain.usecase.GetPopularMoviesUseCase
 import kotlinx.coroutines.Dispatchers
@@ -28,13 +24,12 @@ internal class MainViewModel(val app: Application) : AndroidViewModel(app) {
     private var pagesCount = 0
     private val savedMovies = mutableListOf<Movie>()
 
-    private val _savingMovie = MutableLiveData<SavingMovie>()
-    val savingMovie: LiveData<SavingMovie> = _savingMovie
+    private val _toggleFavouriteMovie = MutableLiveData<ToggleFavouriteMovie>()
+    val toggleFavouriteMovie: LiveData<ToggleFavouriteMovie> = _toggleFavouriteMovie
 
-    val saveToFavourites: (Movie, Int) -> Unit = { it1, it2 ->
+    val toggleInFavourites: (Movie, Int) -> Unit = { it1, it2 ->
+        val myDB = MyDatabaseHelper(app)
         if(it1.isFavourite != true) {
-            val myDB = MyDatabaseHelper(app)
-
             val useCase =
                 GetMovieInformationUseCase(com.example.tinkoff_kinopoisk.data.MovieRepository())
 
@@ -47,9 +42,31 @@ internal class MainViewModel(val app: Application) : AndroidViewModel(app) {
                             result.getOrNull()?.description!!
                         )
                     )
-                        _savingMovie.value = SavingMovie(it2, true)
+                        _toggleFavouriteMovie.value = ToggleFavouriteMovie(it2,
+                            success = true,
+                            isSaving = true
+                        )
                     else
-                        _savingMovie.value = SavingMovie(it2, false)
+                        _toggleFavouriteMovie.value = ToggleFavouriteMovie(it2,
+                            success = false,
+                            isSaving = true
+                        )
+                }
+            }
+        } else {
+            viewModelScope.launch {
+                withContext(Dispatchers.Main) {
+                    if (myDB.removeMovieFromFavourites(it1))
+                        _toggleFavouriteMovie.value = ToggleFavouriteMovie(it2,
+                            success = true,
+                            isSaving = false
+                        )
+                    else
+                        _toggleFavouriteMovie.value = ToggleFavouriteMovie(it2,
+                            success = false,
+                            isSaving = false
+                        )
+
                 }
             }
         }
@@ -109,7 +126,8 @@ internal class MainViewModel(val app: Application) : AndroidViewModel(app) {
 
 }
 
-data class SavingMovie(
+data class ToggleFavouriteMovie(
     var position: Int,
-    var success: Boolean
+    var success: Boolean,
+    var isSaving: Boolean
 )

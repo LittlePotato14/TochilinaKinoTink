@@ -51,6 +51,11 @@ class MyDatabaseHelper(private val context: Context): SQLiteOpenHelper(context, 
 
         return db.insert(TABLE_NAME, null, cv) != (-1).toLong()
     }
+    fun removeMovieFromFavourites(movie: Movie): Boolean {
+        val db = writableDatabase
+
+        return db.delete(TABLE_NAME, "$COLUMN_KINOPOISK_ID=?", arrayOf(movie.filmId.toString())) > 0
+    }
 
     fun getAllSavedMovies(): Cursor?{
         val query = "SELECT * FROM $TABLE_NAME"
