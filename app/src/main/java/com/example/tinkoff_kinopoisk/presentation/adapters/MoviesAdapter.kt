@@ -74,11 +74,9 @@ internal class MoviesAdapter(private var items: List<Movie>, val openMovie: (Mov
                 isEnabled = false
             }
 
-        holder.favouritesIcon.setOnClickListener {
-
-        }
-
-        // ToDo remove from favourites
+        /*TODO holder.favouritesIcon.setOnClickListener {
+            removeFromFavourites(items[position], position)
+        }*/
 
         holder.card.setOnClickListener {
             openMovie(items[position])
